@@ -1,0 +1,45 @@
+#!/bin/sh -e
+
+packages () {
+    apt-get update
+
+    DEBIAN_FRONTEND=noninteractive apt-get install \
+    --assume-yes \
+    --no-install-recommends \
+    "$@"
+
+    rm -rf /var/lib/apt/lists/*
+}
+
+directories () {
+    for dir in "$@"; do
+        mkdir -p "$dir"
+        #chmod 755 "$dir" # drwxr-xr-x
+    done
+}
+
+users () {
+    for user in "$@"; do
+        if ! id -u "$user" >/dev/null 2>&1; then
+            useradd -r -s /bin/bash "$user"
+        fi
+    done
+}
+
+cmd="$1"; shift
+
+case "$cmd" in
+    packages)
+        packages "$@"
+        ;;
+    directories)
+        directories "$@"
+        ;;
+    users)
+        users "$@"
+        ;;
+    *)
+        echo "Unknown subcommand: $cmd" >&2
+        exit 1
+        ;;
+esac
