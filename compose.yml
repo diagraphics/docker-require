@@ -1,0 +1,4 @@
+services:
+  shell:
+    build: .
+    tty: true
